@@ -1,0 +1,11 @@
+# Virtual Environment
+.venv/
+venv/
+env/
+
+# Database files
+*.db
+bank
+
+# Python bytecode
+__pycache__/
