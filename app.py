@@ -108,7 +108,6 @@ def Accounts():
             user = s.query(User).filter_by(username = username).first()
             accounts = s.query(Account).filter_by(user_id = user.id).all()
 
-        #loop
         account_info = ""
         for account in accounts:
             account_info += f"{account.account_number} (${account.balance:.2f})"
@@ -125,37 +124,35 @@ def Accounts():
 
     #add 3 buttons on bottom home payment and products
 
+#imports account_id in the route
 @app.route("/account/<int:account_id>")
 def Account(account_id):
-    if 'username' in session:
-        username = session['username']
+    #checks if username is in session (aka logged in).
+    if 'username' in session: 
+        #reads username from session.
+        username = session['username'] 
 
-        with Session(db) as s:
+        #opens database connection.
+        with Session(db) as s: 
+
+            #queries to find transactions by account.
             account = s.query(Account).filter_by(id = account_id).first()
             user_transactions = s.query(Transaction).filter_by(account_id = account.id).all()
 
-            account_info = ""
             account_info = f"{account.account_number}, {account.balance}"
 
+            #stores transaction info in empty string and loops through every transaction and then returns it.
             transaction_info = "" 
             for transaction in user_transactions:
                 transaction_info += f" {transaction.date}, {transaction.amount}, {transaction.description}"
 
             return f"Hello user:{username}, Your acount & status:{account_info} & Here's your transactions: {transaction_info}"
     else:
+        #if user isnt logged in we redirect to login route.
         return redirect(url_for("Login"))
+    
 
-
-
-@app.route("/payment")
-def Payment():
-    return "Payment Page"
-
-    #payment button that redirects to payment page no matter where its clicked
-
-@app.route("/account_summary")
-def Summary():
-    return "Account Summary Page"
+# thats account_summary
 
 #current balance div in html 
 
@@ -166,6 +163,53 @@ def Summary():
 #home button that redirects to accounts page
 
 #products button that redirects to products page
+
+
+#uses GET and POST methods to send and recieve data form forms.
+@app.route("/payments", methods = ['GET','POST'])
+def Payments():
+    #checks if user is logged in.
+    if 'username' in session:
+        username = session['username']
+        
+        #displays the return string when this webpage is visited.
+        if request.method == 'GET':
+            return "Payments page"
+
+        #using POST to send payee_id and amount info to the databse.
+        if request.method == 'POST':
+            payee_id = request.form.get('payee_id')
+            amount = request.form.get('amount')
+
+            #thsi opens database connection.
+            with Session(db) as s:
+                #querying payee_id, username and user_id to find account info in order to process payment
+                payee = s.query(Payee).filter_by(id = payee_id).first()
+                user = s.query(User).filter_by(username = username).first()
+                account = s.query(Account).filter_by(user_id = user.id).first()
+                
+                #checking if theres enough balance to process payment
+                if float(account.balance) > float(amount):
+                    #removing payement form baance and updating teh balance value
+                    account.balance = account.balance - float(amount)
+                    s.commit() 
+
+                    #storing the info via a dictionary
+                    session['payment_info'] = {
+                        'payee_name':payee.name,
+                        'amount':amount,
+                        'remaining_balance': account.balance}
+                    
+                    #returning successful payment confirmation message 
+                    return redirect(url_for("Payment_success"))
+                else:
+                    return "Insufficeint funds"
+    else:
+        #if user is not logged in, hes redirected to login page        
+        return redirect(url_for("Login"))
+
+    # html payment button that redirects to payment page no matter where its clicked
+
 
 
 @app.route("/select_payee")
