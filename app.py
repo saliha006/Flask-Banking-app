@@ -125,6 +125,28 @@ def Accounts():
 
     #add 3 buttons on bottom home payment and products
 
+@app.route("/account/<int:account_id>")
+def Account(account_id):
+    if 'username' in session:
+        username = session['username']
+
+        with Session(db) as s:
+            account = s.query(Account).filter_by(id = account_id).first()
+            user_transactions = s.query(Transaction).filter_by(account_id = account.id).all()
+
+            account_info = ""
+            account_info = f"{account.account_number}, {account.balance}"
+
+            transaction_info = "" 
+            for transaction in user_transactions:
+                transaction_info += f" {transaction.date}, {transaction.amount}, {transaction.description}"
+
+            return f"Hello user:{username}, Your acount & status:{account_info} & Here's your transactions: {transaction_info}"
+    else:
+        return redirect(url_for("Login"))
+
+
+
 @app.route("/payment")
 def Payment():
     return "Payment Page"
