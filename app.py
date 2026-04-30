@@ -6,8 +6,8 @@ import random
 app = Flask(__name__) 
 app.secret_key = 'bankkey'
 
-db = sa.create_engine("sqlite:///bank.db")
 Base = declarative_base() 
+db = sa.create_engine("sqlite:///bank.db")
 
 
 class User(Base):
@@ -19,11 +19,28 @@ class User(Base):
 
 class Account(Base):
     __tablename__ = 'account'
-    id = sa.Column(sa.Integer, primary_key = True)
-    user_id = sa.Column(sa.Integer, sa.ForeignKey('user.id'), autoincrement= True)
+    id = sa.Column(sa.Integer, primary_key = True, autoincrement = True)
+    user_id = sa.Column(sa.Integer, sa.ForeignKey('user.id'))
     account_number = sa.Column(sa.Integer, nullable= False, unique= True)
     balance = sa.Column(sa.Float, nullable= False, default= 0.00)
     
+class Transaction(Base):
+    __tablename__ = 'transaction'
+    id = sa.Column(sa.Integer, primary_key = True, autoincrement = True)
+    account_id = sa.Column(sa.Integer, sa.ForeignKey('account.id'))
+    description = sa.Column(sa.String(50), nullable = False)
+    amount = sa.Column(sa.Float, nullable = False)
+    date = sa.Column(sa.String(30), nullable = False)
+
+class Payee(Base):
+    __tablename__ = 'payee'
+    id = sa.Column(sa.Integer, primary_key = True, autoincrement = True)
+    user_id = sa.Column(sa.Integer, sa.ForeignKey('user.id'))
+    name = sa.Column(sa.String(30), nullable = False)
+    bank = sa.Column(sa.String(30), nullable = False)
+    account_number = sa.Column(sa.Integer, nullable = False)
+    sort_code = sa.Column(sa.String(30), nullable = False)
+
 
 Base.metadata.create_all(db)
 
