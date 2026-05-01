@@ -47,11 +47,11 @@ class Payee(Base):
 Base.metadata.create_all(db)
 
 @app.route("/")
-def Home():
+def home():
     return "Welcome to the Bank App"
 
 @app.route("/register", methods = ['GET', 'POST'])
-def Register():
+def register():
     if request.method == 'GET':
         return "Register here"
 
@@ -68,12 +68,12 @@ def Register():
             s.add(Account(user_id = new_user.id, account_number = random.randint(12345678, 87654321), balance = 1000.00))
             s.add(Account(user_id = new_user.id, account_number = random.randint(12345678, 87654321), balance = 500.00))
             s.commit()
-            return redirect(url_for("Login"))
+            return redirect(url_for("login"))
         #return render_template("register.html") # For HTML form, not implemented here and others
         
 
 @app.route("/login", methods = ['GET', 'POST'])
-def Login():
+def login():
     if request.method == 'GET':
         return "Login here"
 
@@ -86,7 +86,7 @@ def Login():
 
         if user:
            session['username']= user.username
-           return redirect(url_for("Accounts"))
+           return redirect(url_for("accounts"))
         else:
            return "Username not found"
                 #return to register should be implemneted here or forgot pass
@@ -102,7 +102,7 @@ def Login():
 
 
 @app.route("/reset", methods = ['GET','POST'])
-def Reset():
+def reset():
     #loads page using GET
     if request.method == 'GET':
         return "Reset password Page"
@@ -123,12 +123,12 @@ def Reset():
         else:
             return "Passwords do not match"
 
-    return redirect(url_for('Login'))
+    return redirect(url_for('login'))
 
 
 
 @app.route("/accounts")
-def Accounts():
+def accounts():
 
     if 'username' in session:
         username = session['username']
@@ -142,7 +142,7 @@ def Accounts():
 
         return f"Hello, {username}, Your Accounts: {account_info}"
     else:
-        return redirect(url_for("Login"))
+        return redirect(url_for("login"))
     
     #implement by order of features commented here.
 
@@ -154,7 +154,7 @@ def Accounts():
 
 #imports account_id in the route
 @app.route("/account/<int:account_id>")
-def Account(account_id):
+def account(account_id):
     #checks if username is in session (aka logged in).
     if 'username' in session: 
         #reads username from session.
@@ -177,7 +177,7 @@ def Account(account_id):
             return f"Hello user:{username}, Your acount & status:{account_info} & Here's your transactions: {transaction_info}"
     else:
         #if user isnt logged in we redirect to login route.
-        return redirect(url_for("Login"))
+        return redirect(url_for("login"))
     
 
 # thats account_summary
@@ -195,7 +195,7 @@ def Account(account_id):
 
 #uses GET and POST methods to send and recieve data form forms.
 @app.route("/payments", methods = ['GET','POST'])
-def Payments():
+def payments():
     #checks if user is logged in.
     if 'username' in session:
         username = session['username']
@@ -229,25 +229,25 @@ def Payments():
                         'remaining_balance': account.balance}
                     
                     #returning successful payment confirmation message 
-                    return redirect(url_for("Payment_success"))
+                    return redirect(url_for("payment_success"))
                 else:
                     return "Insufficeint funds"
     else:
         #if user is not logged in, hes redirected to login page        
-        return redirect(url_for("Login"))
+        return redirect(url_for("login"))
 
     # html payment button that redirects to payment page no matter where its clicked
 
 
 @app.route("/payment_success")
-def Payment_success():
+def payment_success():
     #retrieves information from dictionary in the payments route to display confirmation message. 
     payment_info = session.get('payment_info')
     return f"Payment was successfull !! Paid: {payment_info['payee_name']} £{payment_info['amount']}. Remaining account balance: £{payment_info['remaining_balance']}"
     
 
 @app.route("/select_payee")
-def SelectPayee():
+def select_payee():
     return "Select Payee Page"
 
 #has add payee button that redirects to add new payee page on top right corner
@@ -265,16 +265,41 @@ def SelectPayee():
 #whenneww payee is added it showws a confirmation messae with okay btton toclose teh pop up message
 
 
-@app.route("/add_new_payee")
-def AddNewPayee():
-    return "Add New Payee Page"
+@app.route("/add_payee", methods = ['GET','POST'])
+def add_payee():
+    #loads the new payee page
+    if request.method == 'GET':
+        return "Add New Payee Page"
+    
+    #reads the payee info form the form.
+    if request.method == 'POST':
+        name = request.form.get('name')
+        account_number = request.form.get('account_number')
+        bank = request.form.get('bank')
+        sort_code = request.form.get('sort_code')
+
+        #opens db connection in order to save new payee.
+        with Session(db) as s:
+            username = session['username']
+            user = s.query(User).filter_by(username =  username).first()
+            #adds new payee to the database.
+            new_payee = Payee(user_id = user.id, name = name, account_number = account_number, bank = bank, sort_code = sort_code)
+            s.add(new_payee)
+            s.commit()
+
+            return redirect(url_for('payee_added'))
+        
+    else:
+        return "Payee Couldn't be added"
+
+
 
 #form with text boxes for payee name, bank name, account number, sort code and submit button which shows same confirmation 
 # pop up as above in select payee class 
 
 
 @app.route("/products")
-def Product():
+def product():
     return "Products Page"
 
 #products page has a botton taht redirects to accout page when clicked (top right corner)
@@ -297,9 +322,9 @@ def Loans():
 
 
 @app.route("/logout")
-def Logout():
+def logout():
     session.clear()
-    return redirect(url_for("Login"))
+    return redirect(url_for("login"))
 
 
 if __name__ == "__main__":
