@@ -92,14 +92,6 @@ def login():
                 #return to register should be implemneted here or forgot pass
         
 
-        #implement by order of features commented here.
-
-        #forgot pass button taht redirects to password reset page
-
-        #register button that redirects to register page
-
-        #add button in html taht lets you press next and redirects to accounts
-
 
 @app.route("/reset", methods = ['GET','POST'])
 def reset():
@@ -144,13 +136,7 @@ def accounts():
     else:
         return redirect(url_for("login"))
     
-    #implement by order of features commented here.
 
-    #in html add logo on to right corner use creative softwre of my ownto do it
-
-    #make 2 div containers with 2 diff accounts
-
-    #add 3 buttons on bottom home payment and products
 
 #imports account_id in the route
 @app.route("/account/<int:account_id>")
@@ -179,18 +165,6 @@ def account(account_id):
         #if user isnt logged in we redirect to login route.
         return redirect(url_for("login"))
     
-
-# thats account_summary
-
-#current balance div in html 
-
-#move money button that redirects to select payee page
-
-#has a list f transactions that shows the last 2-3 transactions for each account
-
-#home button that redirects to accounts page
-
-#products button that redirects to products page
 
 
 #uses GET and POST methods to send and recieve data form forms.
@@ -236,7 +210,6 @@ def payments():
         #if user is not logged in, hes redirected to login page        
         return redirect(url_for("login"))
 
-    # html payment button that redirects to payment page no matter where its clicked
 
 
 @app.route("/payment_success")
@@ -250,19 +223,6 @@ def payment_success():
 def select_payee():
     return "Select Payee Page"
 
-#has add payee button that redirects to add new payee page on top right corner
-
-#has a list of payees in html 
-
-#has a enter amount text box inteh belwo list of payees
-
-#has cancel and submit buttons
-
-#cancle redicrects to account summary page
-
-#submit shows conformation message with f string (payee name) with okay btton toclose teh pop up message
-
-#whenneww payee is added it showws a confirmation messae with okay btton toclose teh pop up message
 
 
 @app.route("/add_payee", methods = ['GET','POST'])
@@ -291,33 +251,47 @@ def add_payee():
         
     else:
         return "Payee Couldn't be added"
+    
 
+@app.route("/payee_added")
+def payee_added():
+    return "New Payee Added !!!"
 
-
-#form with text boxes for payee name, bank name, account number, sort code and submit button which shows same confirmation 
-# pop up as above in select payee class 
 
 
 @app.route("/products")
-def product():
-    return "Products Page"
+def products():
+    #creating a product dictonary where data can be stored
+    products_dict = [
+        {'name':'loans', 'description':'Flexible loan options from 2.7% APR'},
+        {'name':'mortgages', 'description':'Current mortgages offer £40k-150k with 15 yeras packback period'},
+        {'name':'credit_cards', 'description':'Currently offering credit cards with 6% interest rate for 1 year, then back to 3.5%, £750 credit limit, offer valid for 2 months'}
+    ]
 
-#products page has a botton taht redirects to accout page when clicked (top right corner)
+    products_list = ""
+    #iterating each product in the dictionary
+    for product in products_dict:
+        #saving each product at each iteration in empty products_list
+        products_list += f"{product}"
+    return f"{products_list}"
 
-#3 divs thata re clockable one loans then mortgage then credit card
-
-#clickig on loans will redicrect to loans page 
 
 
 @app.route("/loans")
 def Loans():
-    return "Loans Page"
+    #creates a loan/loan options dictionary
+    loans_dict = [
+        {'name':'Loan', 'description':'Flexible loans can be found below starting from 2.7% APR'},
+        {'name':'Loan Options', 'description':'starter £0-10k from 2.7% APR | inter £10-35k from 4.7% APR | advanced £35-60k from 7.4% APR'
+         }
+    ]
 
-# loans page  also has a botton taht redirects to accout page when clicked (top right corner)
-
-#witha  div with loan image 
-
-#then another abot loan options with text info instead
+    loans_list = ""
+    #iterating each product in the dictionary
+    for loan in loans_dict:
+        #saving each loan at each iteration in empty loans_list
+        loans_list += f"{loan}"
+    return f"{loans_list}"
 
 
 
