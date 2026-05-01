@@ -3,13 +3,15 @@ import sqlalchemy as sa
 from sqlalchemy.orm import declarative_base, Session 
 import random
 
+#flask app setup
 app = Flask(__name__) 
 app.secret_key = 'bankkey'
 
+#database setup
 Base = declarative_base() 
 db = sa.create_engine("sqlite:///bank.db")
 
-
+#different database classes with their relevant attributes
 class User(Base):
     __tablename__ = 'user'
     id = sa.Column(sa.Integer, primary_key = True, autoincrement= True)
@@ -41,7 +43,7 @@ class Payee(Base):
     account_number = sa.Column(sa.Integer, nullable = False)
     sort_code = sa.Column(sa.String(30), nullable = False)
 
-
+#creaing database instances
 Base.metadata.create_all(db)
 
 @app.route("/")
@@ -97,6 +99,32 @@ def Login():
         #register button that redirects to register page
 
         #add button in html taht lets you press next and redirects to accounts
+
+
+@app.route("/reset", methods = ['GET','POST'])
+def Reset():
+    #loads page using GET
+    if request.method == 'GET':
+        return "Reset password Page"
+    
+    if request.method == 'POST':
+        #reads username, new pass and confirmation form HTML form.
+        username = request.form.get('username')
+        new_password = request.form.get('new_password')
+        confirm_password = request.form.get('confirm_password')
+
+        #compares the new pass to repeated pass to ensure correctness.
+        if new_password == confirm_password:
+            with Session(db) as s:
+                #queries User table by username and updates its password.
+                user_query = s.query(User).filter_by(username = username).first()
+                user_query.password = new_password
+                s.commit()
+        else:
+            return "Passwords do not match"
+
+    return redirect(url_for('Login'))
+
 
 
 @app.route("/accounts")
@@ -190,7 +218,7 @@ def Payments():
                 
                 #checking if theres enough balance to process payment
                 if float(account.balance) > float(amount):
-                    #removing payement form baance and updating teh balance value
+                    #removing payment from balance and updating teh balance value
                     account.balance = account.balance - float(amount)
                     s.commit() 
 
@@ -211,6 +239,12 @@ def Payments():
     # html payment button that redirects to payment page no matter where its clicked
 
 
+@app.route("/payment_success")
+def Payment_success():
+    #retrieves information from dictionary in the payments route to display confirmation message. 
+    payment_info = session.get('payment_info')
+    return f"Payment was successfull !! Paid: {payment_info['payee_name']} £{payment_info['amount']}. Remaining account balance: £{payment_info['remaining_balance']}"
+    
 
 @app.route("/select_payee")
 def SelectPayee():
