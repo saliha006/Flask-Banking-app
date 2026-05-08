@@ -48,7 +48,7 @@ Base.metadata.create_all(db)
 
 @app.route("/")
 def home():
-    return render_template('index.html')
+    return render_template('login.html')
 
 @app.route("/register", methods = ['GET', 'POST'])
 def register():
@@ -160,7 +160,7 @@ def account(account_id):
             for transaction in user_transactions:
                 transaction_info += f" {transaction.date}, {transaction.amount}, {transaction.description}"
 
-            return render_template('account_summary.html', account=account, transactions=user_transactions, username=username)
+            return render_template('accounts_summary.html', account=account, transactions=user_transactions, username=username)
     else:
         #if user isnt logged in we redirect to login route.
         return redirect(url_for("login"))
@@ -173,6 +173,11 @@ def payments():
     #checks if user is logged in.
     if 'username' in session:
         username = session['username']
+
+        with Session(db) as s:
+            user = s.query(User).filter_by(username=username).first()
+            payees = s.query(Payee).filter_by(user_id=user.id).all()
+            accounts = s.query(Account).filter_by(user_id=user.id).all()
         
         #displays the return string when this webpage is visited.
         if request.method == 'GET':
@@ -216,7 +221,7 @@ def payments():
 def payment_success():
     #retrieves information from dictionary in the payments route to display confirmation message. 
     payment_info = session.get('payment_info')
-    return render_template('payment_success.html', payment_info=payment_info)
+    return render_template('payments_success.html', payment_info=payment_info)
     
 
 
