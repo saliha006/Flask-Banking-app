@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, url_for, session
+from flask import Flask, request, redirect, url_for, session, render_template
 import sqlalchemy as sa 
 from sqlalchemy.orm import declarative_base, Session 
 import random
@@ -48,12 +48,12 @@ Base.metadata.create_all(db)
 
 @app.route("/")
 def home():
-    return "Welcome to the Bank App"
+    return render_template('index.html')
 
 @app.route("/register", methods = ['GET', 'POST'])
 def register():
     if request.method == 'GET':
-        return "Register here"
+        return render_template('register.html')
 
     if request.method == 'POST':
         username = request.form.get('username')
@@ -75,7 +75,7 @@ def register():
 @app.route("/login", methods = ['GET', 'POST'])
 def login():
     if request.method == 'GET':
-        return "Login here"
+        return render_template('login.html')
 
     if request.method == 'POST':
         username = request.form.get('username')
@@ -97,7 +97,7 @@ def login():
 def reset():
     #loads page using GET
     if request.method == 'GET':
-        return "Reset password Page"
+        return render_template('reset.html')
     
     if request.method == 'POST':
         #reads username, new pass and confirmation form HTML form.
@@ -132,7 +132,7 @@ def accounts():
         for account in accounts:
             account_info += f"{account.account_number} (${account.balance:.2f})"
 
-        return f"Hello, {username}, Your Accounts: {account_info}"
+        return render_template('accounts.html', accounts=accounts, username=username)
     else:
         return redirect(url_for("login"))
     
@@ -160,7 +160,7 @@ def account(account_id):
             for transaction in user_transactions:
                 transaction_info += f" {transaction.date}, {transaction.amount}, {transaction.description}"
 
-            return f"Hello user:{username}, Your acount & status:{account_info} & Here's your transactions: {transaction_info}"
+            return render_template('account_summary.html', account=account, transactions=user_transactions, username=username)
     else:
         #if user isnt logged in we redirect to login route.
         return redirect(url_for("login"))
@@ -176,7 +176,7 @@ def payments():
         
         #displays the return string when this webpage is visited.
         if request.method == 'GET':
-            return "Payments page"
+            return render_template('payments.html', payees=payees, accounts=accounts)
 
         #using POST to send payee_id and amount info to the databse.
         if request.method == 'POST':
@@ -216,20 +216,15 @@ def payments():
 def payment_success():
     #retrieves information from dictionary in the payments route to display confirmation message. 
     payment_info = session.get('payment_info')
-    return f"Payment was successfull !! Paid: {payment_info['payee_name']} £{payment_info['amount']}. Remaining account balance: £{payment_info['remaining_balance']}"
+    return render_template('payment_success.html', payment_info=payment_info)
     
-
-@app.route("/select_payee")
-def select_payee():
-    return "Select Payee Page"
-
 
 
 @app.route("/add_payee", methods = ['GET','POST'])
 def add_payee():
     #loads the new payee page
     if request.method == 'GET':
-        return "Add New Payee Page"
+        return render_template('add_payee.html')
     
     #reads the payee info form the form.
     if request.method == 'POST':
@@ -255,7 +250,7 @@ def add_payee():
 
 @app.route("/payee_added")
 def payee_added():
-    return "New Payee Added !!!"
+    return render_template('payee_added.html')
 
 
 
@@ -273,7 +268,7 @@ def products():
     for product in products_dict:
         #saving each product at each iteration in empty products_list
         products_list += f"{product}"
-    return f"{products_list}"
+    return render_template('products.html', products=products_dict)
 
 
 
@@ -291,7 +286,7 @@ def Loans():
     for loan in loans_dict:
         #saving each loan at each iteration in empty loans_list
         loans_list += f"{loan}"
-    return f"{loans_list}"
+    return render_template('loans.html', loans=loans_dict)
 
 
 
