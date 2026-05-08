@@ -153,13 +153,6 @@ def account(account_id):
             account = s.query(Account).filter_by(id = account_id).first()
             user_transactions = s.query(Transaction).filter_by(account_id = account.id).all()
 
-            account_info = f"{account.account_number}, {account.balance}"
-
-            #stores transaction info in empty string and loops through every transaction and then returns it.
-            transaction_info = "" 
-            for transaction in user_transactions:
-                transaction_info += f" {transaction.date}, {transaction.amount}, {transaction.description}"
-
             return render_template('accounts_summary.html', account=account, transactions=user_transactions, username=username)
     else:
         #if user isnt logged in we redirect to login route.
