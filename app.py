@@ -50,27 +50,6 @@ Base.metadata.create_all(db)
 def home():
     return render_template('login.html')
 
-@app.route("/register", methods = ['GET', 'POST'])
-def register():
-    if request.method == 'GET':
-        return render_template('register.html')
-
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        email = request.form.get('email')
-
-        with Session(db) as s:
-            new_user = User(username = username, password = password, email = email)
-            s.add(new_user)
-            s.flush()  # Ensure the new user is added to the session to get the ID
-
-            s.add(Account(user_id = new_user.id, account_number = random.randint(12345678, 87654321), balance = 1000.00))
-            s.add(Account(user_id = new_user.id, account_number = random.randint(12345678, 87654321), balance = 500.00))
-            s.commit()
-            return redirect(url_for("login"))
-        #return render_template("register.html") # For HTML form, not implemented here and others
-        
 
 @app.route("/login", methods = ['GET', 'POST'])
 def login():
