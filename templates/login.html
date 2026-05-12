@@ -1,4 +1,30 @@
 {% extends "base.html" %}
+
+{% block title %}Log in · BANK{% endblock %}
+
+{% block nav %}{% endblock %}
+
 {% block content %}
-    //content
+<p class="page-eyebrow">Welcome back</p>
+<h1 class="page-title">Log in</h1>
+<p class="page-lede">Sign in to view your accounts and make payments.</p>
+
+<form class="form-stack" method="POST" action="{{ url_for('login') }}">
+    <div class="form-field">
+        <label class="form-label" for="username">Username</label>
+        <input class="form-input" type="text" id="username" name="username" autocomplete="username" required>
+    </div>
+
+    <div class="form-field">
+        <label class="form-label" for="password">Password</label>
+        <input class="form-input" type="password" id="password" name="password" autocomplete="current-password" required>
+    </div>
+
+    <div class="form-link-stack">
+        <a href="{{ url_for('reset') }}" class="text-link">Forgot password?</a>
+        <a href="#" class="text-link">Register</a>
+    </div>
+
+    <button type="submit" class="btn btn-block">Log in</button>
+</form>
 {% endblock %}

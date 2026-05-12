@@ -1,4 +1,32 @@
 {% extends "base.html" %}
+
+{% block title %}Password reset · BANK{% endblock %}
+
+{% block nav %}{% endblock %}
+
 {% block content %}
-    //content
+<p class="page-eyebrow">Forgot it</p>
+<h1 class="page-title">Password reset</h1>
+<p class="page-lede">Choose a new password for your account.</p>
+
+<form class="form-stack" method="POST" action="{{ url_for('reset') }}">
+    <div class="form-field">
+        <label class="form-label" for="username">Username</label>
+        <input class="form-input" type="text" id="username" name="username" autocomplete="username" required>
+    </div>
+
+    <div class="form-field">
+        <label class="form-label" for="new_password">New password</label>
+        <input class="form-input" type="password" id="new_password" name="new_password" autocomplete="new-password" required>
+    </div>
+
+    <div class="form-field">
+        <label class="form-label" for="confirm_password">Confirm password</label>
+        <input class="form-input" type="password" id="confirm_password" name="confirm_password" autocomplete="new-password" required>
+    </div>
+
+    <button type="submit" class="btn btn-block">Reset password</button>
+</form>
+
+<p class="form-helper"><a href="{{ url_for('login') }}" class="text-link">Back to log in</a></p>
 {% endblock %}

@@ -222,6 +222,13 @@ body::before {
     margin: var(--space-5) 0 0;
 }
 
+.form-link-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3);
+}
+
 /* ---------- buttons ---------- */
 .btn {
     display: inline-flex;
