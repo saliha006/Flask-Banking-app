@@ -1,4 +1,29 @@
 {% extends "base.html" %}
+
+{% block title %}Accounts · BANK{% endblock %}
+
+{% block header_right %}
+<img src="{{ url_for('static', filename='logo.svg') }}" alt="" class="brand-logo">
+{% endblock %}
+
 {% block content %}
-    //content
+<h1 class="page-title">Accounts</h1>
+
+<div class="accounts-list">
+    {% for account in accounts %}
+    <a href="{{ url_for('account', account_id=account.id) }}" class="account-card">
+        <div class="account-card-row">
+            <span class="account-card-name">Account {{ loop.index }}</span>
+            <span class="account-card-balance">£{{ "%.2f"|format(account.balance) }}</span>
+        </div>
+        <div class="account-card-meta">Account no. {{ account.formatted_number }}</div>
+    </a>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block footer %}
+<div class="footer-utility">
+    <a href="{{ url_for('logout') }}" class="sign-out">Sign out</a>
+</div>
 {% endblock %}

@@ -108,11 +108,11 @@ def accounts():
             user = s.query(User).filter_by(username = username).first()
             accounts = s.query(Account).filter_by(user_id = user.id).all()
         
-        total_balance = 0
         for account in accounts:
-            total_balance += account.balance
+            acc_str = str(account.account_number) 
+            account.formatted_number = f"{acc_str[:4]} {acc_str[4:]}"
 
-        return render_template('accounts.html', accounts=accounts, username=username, total_balance = total_balance)
+        return render_template('accounts.html', accounts=accounts, username=username)
     else:
         return redirect(url_for("login"))
     
