@@ -96,9 +96,10 @@ body::before {
 
 .page-header-title {
     margin: 0;
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 600;
     letter-spacing: -0.01em;
+    color: var(--ink);
 }
 
 .brand-logo {
@@ -369,3 +370,91 @@ body::before {
     margin-top: var(--space-2);
 }
 
+
+/* ---------- account summary page ---------- */
+.balance-hero {
+    text-align: center;
+    margin: var(--space-5) 0 var(--space-5);
+}
+
+.balance-hero-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+    margin: 0 0 var(--space-2);
+}
+
+.balance-hero-amount {
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    margin: 0;
+}
+
+.move-money-btn {
+    margin-bottom: var(--space-6);
+}
+
+.tx-section-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+    margin: 0 0 var(--space-3);
+}
+
+.tx-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.tx-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--hairline-2);
+}
+
+.tx-row:last-child { border-bottom: 0; }
+
+.tx-main {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.tx-desc {
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tx-date {
+    font-size: 11px;
+    color: var(--ink-2);
+    letter-spacing: 0.06em;
+}
+
+.tx-amount {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+.tx-amount--out { color: var(--negative); }
+.tx-amount--in  { color: var(--positive); }
+
+.tx-empty {
+    text-align: center;
+    padding: var(--space-6) 0;
+    font-size: 13px;
+    color: var(--ink-2);
+}
