@@ -107,12 +107,12 @@ def accounts():
         with Session(db) as s:
             user = s.query(User).filter_by(username = username).first()
             accounts = s.query(Account).filter_by(user_id = user.id).all()
-
-        account_info = ""
+        
+        total_balance = 0
         for account in accounts:
-            account_info += f"{account.account_number} (${account.balance:.2f})"
+            total_balance += account.balance
 
-        return render_template('accounts.html', accounts=accounts, username=username)
+        return render_template('accounts.html', accounts=accounts, username=username, total_balance = total_balance)
     else:
         return redirect(url_for("login"))
     
@@ -247,17 +247,16 @@ def products():
         {'name':'credit_cards', 'description':'Currently offering credit cards with 6% interest rate for 1 year, then back to 3.5%, £750 credit limit, offer valid for 2 months'}
     ]
 
-    products_list = ""
-    #iterating each product in the dictionary
+    #converts each product nam einto a display friendly label
     for product in products_dict:
-        #saving each product at each iteration in empty products_list
-        products_list += f"{product}"
+        product['display_name'] = product['name'].replace('_',' ').title()
+
     return render_template('products.html', products=products_dict)
 
 
 
 @app.route("/loans")
-def Loans():
+def loans():
     #creates a loan/loan options dictionary
     loans_dict = [
         {'name':'Loan', 'description':'Flexible loans can be found below starting from 2.7% APR'},
@@ -265,11 +264,10 @@ def Loans():
          }
     ]
 
-    loans_list = ""
-    #iterating each product in the dictionary
+
     for loan in loans_dict:
-        #saving each loan at each iteration in empty loans_list
-        loans_list += f"{loan}"
+        if '|' in loan['description']:
+            loan['tiers'] = [tier.strip() for tier in loan['description'].split('|')]
     return render_template('loans.html', loans=loans_dict)
 
 
