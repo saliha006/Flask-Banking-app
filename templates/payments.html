@@ -41,6 +41,8 @@
         </div>
     </div>
 
+    {% if error %}<p class="form-error">{{ error }}</p>{% endif %}
+
     <div class="action-bar">
         <a href="{{ url_for('accounts') }}" class="btn btn-secondary">Cancel</a>
         <button type="submit" class="btn">Submit</button>

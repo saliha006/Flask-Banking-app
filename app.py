@@ -68,7 +68,7 @@ def login():
            session['username']= user.username
            return redirect(url_for("accounts"))
         else:
-           return "Username not found"
+           return render_template('login.html' , error='Username not found')
                 #return to register should be implemneted here or forgot pass
         
 
@@ -93,7 +93,7 @@ def reset():
                 user_query.password = new_password
                 s.commit()
         else:
-            return "Passwords do not match"
+            return render_template('reset.html', error ='Passwords do not match') 
 
     return redirect(url_for('login'))
 
@@ -189,7 +189,7 @@ def payments():
                     #returning successful payment confirmation message 
                     return redirect(url_for("payment_success"))
                 else:
-                    return "Insufficeint funds"
+                    return render_template('payments.html', payees = payees, accounts = accounts, error= 'Insufficient funds')
     else:
         #if user is not logged in, hes redirected to login page        
         return redirect(url_for("login"))
@@ -229,7 +229,7 @@ def add_payee():
             return redirect(url_for('payee_added'))
         
     else:
-        return "Payee Couldn't be added"
+        return render_template('add_payee.html', error = "Payee couldn't be added")
     
 
 @app.route("/payee_added")

@@ -35,6 +35,8 @@
         <input class="form-input form-input--boxed" type="text" id="sort_code" name="sort_code" placeholder="e.g. 12-34-56" required>
     </div>
 
+    {% if error %}<p class="form-error">{{ error }}</p>{% endif %}
+
     <button type="submit" class="btn btn-block">Add payee</button>
 </form>
 {% endblock %}
