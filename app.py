@@ -2,6 +2,7 @@ from flask import Flask, request, redirect, url_for, session, render_template
 import sqlalchemy as sa 
 from sqlalchemy.orm import declarative_base, Session 
 import random
+import datetime
 
 #flask app setup
 app = Flask(__name__) 
@@ -169,8 +170,14 @@ def payments():
                 
                 #checking if theres enough balance to process payment
                 if float(account.balance) > float(amount):
-                    #removing payment from balance and updating teh balance value
                     account.balance = account.balance - float(amount)
+
+                    s.add(Transaction(
+                        account_id=account.id,
+                        description=f"Payment to {payee.name}",
+                        amount=-float(amount),
+                        date=datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+                     ))
                     s.commit() 
 
                     #storing the info via a dictionary
