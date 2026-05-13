@@ -1,14 +1,15 @@
 {% extends "base.html" %}
 
-{% block title %}Accounts · BANK{% endblock %}
+{% block title %}Accounts · Bank{% endblock %}
 
-{% block header_right %}
-<img src="{{ url_for('static', filename='logo.svg') }}" alt="" class="brand-logo">
+{% block header %}
+<header class="page-header">
+    <h1 class="page-header-title">Accounts</h1>
+    <img src="{{ url_for('static', filename='logo.svg') }}" alt="" class="brand-logo">
+</header>
 {% endblock %}
 
 {% block content %}
-<h1 class="page-title">Accounts</h1>
-
 <div class="accounts-list">
     {% for account in accounts %}
     <a href="{{ url_for('account', account_id=account.id) }}" class="account-card">

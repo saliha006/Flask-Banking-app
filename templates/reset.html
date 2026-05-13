@@ -1,14 +1,16 @@
 {% extends "base.html" %}
 
-{% block title %}Password reset · BANK{% endblock %}
+{% block title %}Password Reset · Bank{% endblock %}
+
+{% block header %}
+<header class="page-header page-header--centered">
+    <h1 class="page-header-title">Password Reset</h1>
+</header>
+{% endblock %}
 
 {% block nav %}{% endblock %}
 
 {% block content %}
-<p class="page-eyebrow">Forgot it</p>
-<h1 class="page-title">Password reset</h1>
-<p class="page-lede">Choose a new password for your account.</p>
-
 <form class="form-stack" method="POST" action="{{ url_for('reset') }}">
     <div class="form-field">
         <label class="form-label" for="username">Username</label>

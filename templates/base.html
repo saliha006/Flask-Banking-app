@@ -9,18 +9,7 @@
 </head>
 <body>
     <div class="phone-frame">
-        {% block header %}
-        <header class="page-header">
-            <span class="brand"><span class="brand-mark"></span>BANK</span>
-            {% block header_right %}
-                {% if session.get('username') %}
-                <a href="{{ url_for('accounts') }}" class="brand-logo-link" aria-label="Home">
-                    <img src="{{ url_for('static', filename='logo.svg') }}" alt="" class="brand-logo">
-                </a>
-                {% endif %}
-            {% endblock %}
-        </header>
-        {% endblock %}
+        {% block header %}{% endblock %}
 
         <main class="page-content">
             {% block content %}{% endblock %}

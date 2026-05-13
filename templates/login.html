@@ -1,14 +1,16 @@
 {% extends "base.html" %}
 
-{% block title %}Log in · BANK{% endblock %}
+{% block title %}Log in · Bank{% endblock %}
+
+{% block header %}
+<header class="page-header page-header--centered">
+    <h1 class="page-header-title">Log in</h1>
+</header>
+{% endblock %}
 
 {% block nav %}{% endblock %}
 
 {% block content %}
-<p class="page-eyebrow">Welcome back</p>
-<h1 class="page-title">Log in</h1>
-<p class="page-lede">Sign in to view your accounts and make payments.</p>
-
 <form class="form-stack" method="POST" action="{{ url_for('login') }}">
     <div class="form-field">
         <label class="form-label" for="username">Username</label>
