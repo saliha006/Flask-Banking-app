@@ -1,4 +1,40 @@
 {% extends "base.html" %}
+
+{% block title %}Payment Success · Bank{% endblock %}
+
+{% block header %}
+<header class="page-header">
+    <h1 class="page-header-title">Select Payee</h1>
+    <a href="{{ url_for('payments') }}" class="header-icon-btn" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </a>
+</header>
+{% endblock %}
+
+{% block nav %}{% endblock %}
+
 {% block content %}
-    //content
+<div class="confirmation-screen">
+    <div class="confirmation-card">
+        <p class="confirmation-eyebrow">Payment</p>
+        <h2 class="confirmation-title">PAYMENT SUCCESS</h2>
+        <dl class="confirmation-details">
+            <div class="confirmation-row">
+                <dt class="confirmation-label">Payee</dt>
+                <dd class="confirmation-value">{{ payment_info.payee_name }}</dd>
+            </div>
+            <div class="confirmation-row">
+                <dt class="confirmation-label">Amount</dt>
+                <dd class="confirmation-value">£{{ "%.2f"|format(payment_info.amount|float) }}</dd>
+            </div>
+            <div class="confirmation-row">
+                <dt class="confirmation-label">Remaining</dt>
+                <dd class="confirmation-value">£{{ "%.2f"|format(payment_info.remaining_balance) }}</dd>
+            </div>
+        </dl>
+    </div>
+    <div class="confirmation-actions">
+        <a href="{{ url_for('payments') }}" class="btn">Close</a>
+    </div>
+</div>
 {% endblock %}
