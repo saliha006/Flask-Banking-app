@@ -1,4 +1,50 @@
 {% extends "base.html" %}
+
+{% block title %}Loans · Bank{% endblock %}
+
+{% block header %}
+<header class="page-header">
+    <h1 class="page-header-title">Loans</h1>
+    <a href="{{ url_for('accounts') }}" class="brand-logo-link" aria-label="Home">
+        <img src="{{ url_for('static', filename='logo.svg') }}" alt="" class="brand-logo">
+    </a>
+</header>
+{% endblock %}
+
+{% block nav %}{% endblock %}
+
 {% block content %}
-    //content
+<div class="loans-screen">
+    {% for loan in loans %}
+        {% if loan.tiers %}
+        <div class="loan-section">
+            <p class="loan-section-title">{{ loan.name }}</p>
+            <section class="loan-options">
+                <div class="loan-tiers">
+                    {% for tier in loan.tiers %}
+                        {% set parts = tier.split(' ', 1) %}
+                        <div class="loan-tier">
+                            <span class="loan-tier-name">{{ parts[0] }}</span>
+                            <span class="loan-tier-detail">{{ parts[1] }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+        </div>
+        {% else %}
+        <div class="loan-intro" aria-hidden="true">
+            <svg viewBox="0 0 160 80" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <ellipse cx="35" cy="30" rx="20" ry="6"/>
+                <path d="M15 30v8c0 3.3 9 6 20 6s20-2.7 20-6v-8"/>
+                <path d="M15 38v8c0 3.3 9 6 20 6s20-2.7 20-6v-8"/>
+                <path d="M15 46v8c0 3.3 9 6 20 6s20-2.7 20-6v-8"/>
+                <path d="M75 65L100 40L120 50L150 18"/>
+                <path d="M140 18L150 18L150 28"/>
+                <circle cx="100" cy="40" r="1.5" fill="currentColor"/>
+                <circle cx="120" cy="50" r="1.5" fill="currentColor"/>
+            </svg>
+        </div>
+        {% endif %}
+    {% endfor %}
+</div>
 {% endblock %}
