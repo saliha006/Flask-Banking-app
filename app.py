@@ -12,8 +12,9 @@ app.secret_key = 'bankkey'
 Base = declarative_base() 
 db = sa.create_engine("sqlite:///bank.db")
 
-#different database classes with their relevant attributes
+#database model classes
 class User(Base):
+    """class rapresenting a regsitered user account."""
     __tablename__ = 'user'
     id = sa.Column(sa.Integer, primary_key = True, autoincrement= True)
     username = sa.Column(sa.String(50), nullable= False)
@@ -21,6 +22,7 @@ class User(Base):
     email = sa.Column(sa.String(80),nullable= False)
 
 class Account(Base):
+    """rapresents a bank account linked to a user."""
     __tablename__ = 'account'
     id = sa.Column(sa.Integer, primary_key = True, autoincrement = True)
     user_id = sa.Column(sa.Integer, sa.ForeignKey('user.id'))
@@ -28,6 +30,7 @@ class Account(Base):
     balance = sa.Column(sa.Float, nullable= False, default= 0.00)
     
 class Transaction(Base):
+    """rapresents a transaction belonging to an account."""
     __tablename__ = 'transaction'
     id = sa.Column(sa.Integer, primary_key = True, autoincrement = True)
     account_id = sa.Column(sa.Integer, sa.ForeignKey('account.id'))
@@ -36,6 +39,7 @@ class Transaction(Base):
     date = sa.Column(sa.String(30), nullable = False)
 
 class Payee(Base):
+    """rapresents a saved payee the user can send payements to."""
     __tablename__ = 'payee'
     id = sa.Column(sa.Integer, primary_key = True, autoincrement = True)
     user_id = sa.Column(sa.Integer, sa.ForeignKey('user.id'))
@@ -44,16 +48,18 @@ class Payee(Base):
     account_number = sa.Column(sa.Integer, nullable = False)
     sort_code = sa.Column(sa.String(30), nullable = False)
 
-#creaing database instances
+#creating database instances
 Base.metadata.create_all(db)
 
 @app.route("/")
 def home():
+    """Landing page, it renders the login template as the app main page."""
     return render_template('login.html')
 
 
 @app.route("/login", methods = ['GET', 'POST'])
 def login():
+    """Handles the user login, GET renders the form and POST verifies credentials and starts a session."""
     if request.method == 'GET':
         return render_template('login.html')
 
@@ -64,23 +70,23 @@ def login():
         with Session(db) as s:
             user = s.query(User).filter_by(username = username, password = password).first()
 
+        #if credentials match a user, then a session is started otherwise the form is re-rendered with an error.
         if user:
            session['username']= user.username
            return redirect(url_for("accounts"))
         else:
            return render_template('login.html' , error='Username not found')
-                #return to register should be implemneted here or forgot pass
-        
+
 
 
 @app.route("/reset", methods = ['GET','POST'])
 def reset():
-    #loads page using GET
+    """Handles password reset, GET shows the form and POST updates the user's password if the confirmation password also matches."""
     if request.method == 'GET':
         return render_template('reset.html')
     
     if request.method == 'POST':
-        #reads username, new pass and confirmation form HTML form.
+        #reads username, new pass and confirmation from the HTML form.
         username = request.form.get('username')
         new_password = request.form.get('new_password')
         confirm_password = request.form.get('confirm_password')
@@ -101,7 +107,7 @@ def reset():
 
 @app.route("/accounts")
 def accounts():
-
+    """Shows the logged-in user's accounts with formatted account numbers."""
     if 'username' in session:
         username = session['username']
         with Session(db) as s:
@@ -118,24 +124,20 @@ def accounts():
     
 
 
-#imports account_id in the route
+#account_id is captured from the URL via the <int:account_id> route parameter
 @app.route("/account/<int:account_id>")
 def account(account_id):
-    #checks if username is in session (aka logged in).
-    if 'username' in session: 
-        #reads username from session.
-        username = session['username'] 
+    """Shows the transaction summary for a specific account identified by the account_id."""
+    if 'username' in session:
+        username = session['username']
 
-        #opens database connection.
-        with Session(db) as s: 
-
-            #queries to find transactions by account.
+        with Session(db) as s:
+            #look up the requested account, then load every transaction tied to it
             account = s.query(Account).filter_by(id = account_id).first()
             user_transactions = s.query(Transaction).filter_by(account_id = account.id).all()
 
             return render_template('accounts_summary.html', account=account, transactions=user_transactions, username=username)
     else:
-        #if user isnt logged in we redirect to login route.
         return redirect(url_for("login"))
     
 
@@ -143,7 +145,7 @@ def account(account_id):
 #uses GET and POST methods to send and recieve data form forms.
 @app.route("/payments", methods = ['GET','POST'])
 def payments():
-    #checks if user is logged in.
+    """Handles making a payment feature, GET shows the payee list and the amount form; POST deducts the amount from the user's account, logs the transaction, and redirects to the success page."""
     if 'username' in session:
         username = session['username']
 
@@ -151,8 +153,7 @@ def payments():
             user = s.query(User).filter_by(username=username).first()
             payees = s.query(Payee).filter_by(user_id=user.id).all()
             accounts = s.query(Account).filter_by(user_id=user.id).all()
-        
-        #displays the return string when this webpage is visited.
+
         if request.method == 'GET':
             return render_template('payments.html', payees=payees, accounts=accounts)
 
@@ -161,7 +162,6 @@ def payments():
             payee_id = request.form.get('payee_id')
             amount = request.form.get('amount')
 
-            #thsi opens database connection.
             with Session(db) as s:
                 #querying payee_id, username and user_id to find account info in order to process payment
                 payee = s.query(Payee).filter_by(id = payee_id).first()
@@ -180,25 +180,24 @@ def payments():
                      ))
                     s.commit() 
 
-                    #storing the info via a dictionary
+                    #store the payment details in the session so that the confirmation page can read them
                     session['payment_info'] = {
                         'payee_name':payee.name,
                         'amount':amount,
                         'remaining_balance': account.balance}
-                    
-                    #returning successful payment confirmation message 
+
                     return redirect(url_for("payment_success"))
                 else:
                     return render_template('payments.html', payees = payees, accounts = accounts, error= 'Insufficient funds')
     else:
-        #if user is not logged in, hes redirected to login page        
         return redirect(url_for("login"))
 
 
 
 @app.route("/payment_success")
 def payment_success():
-    #retrieves information from dictionary in the payments route to display confirmation message. 
+    """Shows the payment confirmation popup using the payment_info stored in the session."""
+    #retrieves information from dictionary in the payments route to display confirmation message.
     payment_info = session.get('payment_info')
     return render_template('payments_success.html', payment_info=payment_info)
     
@@ -206,22 +205,21 @@ def payment_success():
 
 @app.route("/add_payee", methods = ['GET','POST'])
 def add_payee():
-    #loads the new payee page
+    """Handles adding a new payee. GET displays the form and POST saves the payee for the currently logged-in user."""
     if request.method == 'GET':
         return render_template('add_payee.html')
     
-    #reads the payee info form the form.
+    #reads the payee info from the form.
     if request.method == 'POST':
         name = request.form.get('name')
         account_number = request.form.get('account_number')
         bank = request.form.get('bank')
         sort_code = request.form.get('sort_code')
 
-        #opens db connection in order to save new payee.
         with Session(db) as s:
             username = session['username']
             user = s.query(User).filter_by(username =  username).first()
-            #adds new payee to the database.
+            # builds the new payee from the form fields and saves it under the current user 
             new_payee = Payee(user_id = user.id, name = name, account_number = account_number, bank = bank, sort_code = sort_code)
             s.add(new_payee)
             s.commit()
@@ -234,20 +232,22 @@ def add_payee():
 
 @app.route("/payee_added")
 def payee_added():
+    """ Shows the payee added confirmation popup after a successful payee submission."""
     return render_template('payee_added.html')
 
 
 
 @app.route("/products")
 def products():
+    """Shows the banking products with display-friendly labels."""
     #creating a product dictonary where data can be stored
     products_dict = [
         {'name':'loans', 'description':'Flexible loan options from 2.7% APR'},
-        {'name':'mortgages', 'description':'Current mortgages offer £40k-150k with 15 yeras packback period'},
+        {'name':'mortgages', 'description':'Current mortgages offer £40k-150k with 15 years payback period'},
         {'name':'credit_cards', 'description':'Currently offering credit cards with 6% interest rate for 1 year, then back to 3.5%, £750 credit limit, offer valid for 2 months'}
     ]
 
-    #converts each product nam einto a display friendly label
+    #converts each product name into a display friendly label
     for product in products_dict:
         product['display_name'] = product['name'].replace('_',' ').title()
 
@@ -257,6 +257,7 @@ def products():
 
 @app.route("/loans")
 def loans():
+    """Shows the loans page with the intro card and a loan-tier breakdown for the loan options section."""
     #creates a loan/loan options dictionary
     loans_dict = [
         {'name':'Loan', 'description':'Flexible loans can be found below starting from 2.7% APR'},
@@ -265,6 +266,7 @@ def loans():
     ]
 
 
+    #only the loan options have line-separated tiers, so we split those into a clean list for the template to render
     for loan in loans_dict:
         if '|' in loan['description']:
             loan['tiers'] = [tier.strip() for tier in loan['description'].split('|')]
@@ -274,10 +276,10 @@ def loans():
 
 @app.route("/logout")
 def logout():
+    """Clears the session and return the user to the login page."""
     session.clear()
     return redirect(url_for("login"))
 
 
 if __name__ == "__main__":
     app.run(port= 8080, debug=True)
-    
